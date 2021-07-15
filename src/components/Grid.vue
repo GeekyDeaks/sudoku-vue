@@ -4,16 +4,17 @@
       <div v-for="row, i in puzzle.board" :key="i" class="row" 
         @click.right.prevent="clearSelected">
         <div v-for="cell, j in row" 
-            :key="j" class="cell" 
+            :key="j" class="cell unselectable" 
             :class="[{ selected: cell.selected }, 'valuelen' + cell.value.length, { editable: cell.editable} ]"
-            @click.prevent="select(cell)"
+            @click.prevent.exact="selectOnly(cell)"
+            @click.prevent.shift.exact="select(cell)"
             @keydown.esc.exact="clearSelected"
             @keydown.exact="updateValue"
             @keydown.shift.exact="updatePencil"
             @keydown.delete.exact="clearValues"
             tabindex="0">
           {{ cell.value }}
-          <div v-if="cell.pencil && !cell.value" class="pencil" v-html="cell.pencilAsBlock().join('\n')">
+          <div v-if="cell.pencil && !cell.value" class="pencil unselectable" v-html="cell.pencilAsBlock().join('\n')">
           </div>
         </div>
       </div>
@@ -29,6 +30,11 @@ export default {
   methods: {
     select(cell) {
       cell.selected = !cell.selected
+    },
+    selectOnly(cell) {
+      let selected = !cell.selected
+      this.clearSelected()
+      cell.selected = selected
     },
     clearSelected() {
       this.puzzle.clearSelected()
@@ -69,6 +75,13 @@ export default {
 
 <style scoped>
 
+.unselectable {
+  user-select: none; /* CSS3 (little to no support) */
+  -ms-user-select: none; /* IE 10+ */
+  -moz-user-select: none; /* Gecko (Firefox) */
+  -webkit-user-select: none; /* Webkit (Safari, Chrome) */
+}
+
 .pencil {
   font-size: 0.3em;
   height: 100%;
@@ -87,7 +100,7 @@ export default {
   align-items: center; /* vertical */
   justify-content: center; /* horizontal */
   border-right: 1px solid darkgray;
-  font-size: 4em;
+  font-size: 3.5em;
   font-weight: bold;
 }
 
