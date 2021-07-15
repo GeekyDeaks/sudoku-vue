@@ -1,3 +1,4 @@
+
 import puzzles from './puzzles'
 
 const BOARD_SIZE = 9
@@ -64,7 +65,7 @@ class SudokuCell {
 class SudokuPuzzle {
 
 
-    constructor(string, id) {
+    constructor(string) {
         // split the puzzle into 
         this.cells = string.match(/./g).map( createCell )
         this.board = Array(BOARD_SIZE).fill([]).map( () => Array(BOARD_SIZE))
@@ -75,8 +76,6 @@ class SudokuPuzzle {
             c.col = Math.floor(i / BOARD_SIZE)
             this.board[c.row][c.col] = c
         })
-
-        this.id = id
 
     }
 
@@ -95,9 +94,9 @@ function createCell(value) {
 }
 
 
-function fromPuzzleString(puzzle, id) {
+function fromPuzzleString(puzzle) {
 
-    return new SudokuPuzzle(puzzle, id)
+    return new SudokuPuzzle(puzzle)
     /* 
     // split the puzzle into 
     let rows = puzzle.match(/.{9}/g)
@@ -119,17 +118,16 @@ function randomPuzzle() {
         Math.random() * puzzles.length
     )
 
-    let board = fromPuzzleString(puzzles[index], index + 1)
+    let board = fromPuzzleNumber(index)
+    board.id = index
     return board
 
 
 }
 
 function fromPuzzleNumber(pn) {
-    let index = (Math.floor(pn - 1) ) % puzzles.length
-
-    let board = fromPuzzleString(puzzles[index], index + 1)
-    return board
+    let index = cleanID(pn)
+    if(index) return fromPuzzleString(puzzles[index - 1])
 }
 
 function isValidPuzzleString(board) {
@@ -137,6 +135,13 @@ function isValidPuzzleString(board) {
         board.match(/[.0-9]{81}/)
 }
 
+function cleanID(id) {
+    id = +id
+    if(isNaN(id)) return 0
+    id = Math.floor(id)
+    if(id > 0 && id <= puzzles.length) return id
+    return 0
+}
 
 export {
     fromPuzzleString,

@@ -13,17 +13,19 @@ export default {
   data() {
 
     let id = this.$route.params.id
-    let puzzle = randomPuzzle()
-    if(!isNaN(+id) && +id > 0) {
-      // try and get the board
-      puzzle = fromPuzzleNumber(+id)
-    } else if(isValidPuzzleString(id)) {
-      // make the board from the id string
-      puzzle = fromPuzzleString(id, 'X')
+    let puzzle = fromPuzzleNumber(id)
+    if(!puzzle && isValidPuzzleString(id)) { 
+      puzzle = fromPuzzleString(id)
+      id = '(generated)'
+    }
+
+    if(!puzzle) {
+      puzzle = randomPuzzle()
+      id = puzzle.id + ' (random)'
     }
 
     return {
-      id: puzzle.id,
+      id,
       puzzle
     }
   },
